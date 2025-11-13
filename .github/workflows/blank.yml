@@ -1,0 +1,36 @@
+name: Auto IP Collector
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */12 * * *' # every 12 hours
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Download CM zip
+        run: |
+          wget -O all.json https://zip.cm.edu.kg/all.json
+
+      - name: 🧠 Run IP collector script
+        run: |
+          python run.py
+
+      - name: 📤 Commit and push IP results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add all.txt
+          git diff --cached --quiet || git commit -m "Updated at ${update_version}"
+          git push
