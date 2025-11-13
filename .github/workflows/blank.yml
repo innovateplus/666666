@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
       - name: 🐍 Set up Python
         uses: actions/setup-python@v4
@@ -28,10 +26,14 @@ jobs:
         run: |
           python run.py
 
-      - name: 📤 Commit Changes
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit and push the obfuscated file
         run: |
-          git add all.txt
-          git diff --cached --quiet || git commit -m "Updated at ${update_version}"
-          git push origin main
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add 'all.txt'
+          if git diff --staged --quiet; then
+            echo "No changes to commit, the obfuscated file is already up-to-date."
+          else
+            git commit -m "UPDATED PROXYFILE"
+            git push
+          fi
