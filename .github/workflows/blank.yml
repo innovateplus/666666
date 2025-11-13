@@ -26,11 +26,16 @@ jobs:
         run: |
           python run.py
 
-      - name: 📤 Commit and push IP results
+      - name: 📤 Commit Changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           git add all.txt
           git diff --cached --quiet || git commit -m "Updated at ${update_version}"
-          git push
+
+      - name: 📤📤📤 Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
